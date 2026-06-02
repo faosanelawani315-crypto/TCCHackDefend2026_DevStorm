@@ -1,0 +1,90 @@
+# AeroSafe AI — Docker Compose
+# Lance 4 services : PHP/API Platform, PWA Next.js, PostgreSQL, Microservice Python IA
+
+services:
+
+  # ─────────────────────────────────────────────
+  # Backend PHP — API Platform (Symfony)
+  # Accessible sur https://localhost
+  # ─────────────────────────────────────────────
+  php:
+    image: ${IMAGES_PREFIX:-}app-php
+    depends_on:
+      - database
+      - ia_service
+    restart: unless-stopped
+    environment:
+      PWA_UPSTREAM: pwa:3000
+      SERVER_NAME: ${SERVER_NAME:-localhost}, php:80
+      MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-AeroSafeMercureSecret2025!}
+      MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-AeroSafeMercureSecret2025!}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
+      TRUSTED_HOSTS: ${TRUSTED_HOSTS:-^${SERVER_NAME:-example\.com|localhost}|php$$}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-aerosafe}:${POSTGRES_PASSWORD:-AeroSafe2025!}@database:5432/${POSTGRES_DB:-aerosafe_ai}?serverVersion=${POSTGRES_VERSION:-16}&charset=${POSTGRES_CHARSET:-utf8}
+      MERCURE_URL: ${CADDY_MERCURE_URL:-http://php/.well-known/mercure}
+      MERCURE_PUBLIC_URL: ${CADDY_MERCURE_PUBLIC_URL:-https://${SERVER_NAME:-localhost}/.well-known/mercure}
+      MERCURE_JWT_SECRET: ${CADDY_MERCURE_JWT_SECRET:-AeroSafeMercureSecret2025!}
+      # URL du microservice IA Python
+      IA_SERVICE_URL: http://ia_service:5000
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - target: 80
+        published: ${HTTP_PORT:-80}
+        protocol: tcp
+      - target: 443
+        published: ${HTTPS_PORT:-443}
+        protocol: tcp
+      - target: 443
+        published: ${HTTP3_PORT:-443}
+        protocol: udp
+
+  # ─────────────────────────────────────────────
+  # Frontend Next.js — Dashboard AeroSafe
+  # Accessible sur https://localhost (via php proxy)
+  # ─────────────────────────────────────────────
+  pwa:
+    image: ${IMAGES_PREFIX:-}app-pwa
+    environment:
+      NEXT_PUBLIC_ENTRYPOINT: http://php
+      NEXT_PUBLIC_APP_NAME: AeroSafe AI
+
+  # ─────────────────────────────────────────────
+  # Base de données PostgreSQL
+  # ─────────────────────────────────────────────
+  database:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-aerosafe_ai}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-AeroSafe2025!}
+      - POSTGRES_USER=${POSTGRES_USER:-aerosafe}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB:-aerosafe_ai}", "-U", "${POSTGRES_USER:-aerosafe}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+
+  # ─────────────────────────────────────────────
+  # Microservice Python Flask — Algorithme IA
+  # Accessible depuis PHP sur http://ia_service:5000
+  # ─────────────────────────────────────────────
+  ia_service:
+    build:
+      context: ./ia_service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  caddy_data:
+  caddy_config:
+  database_data:
