@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroSafe AI - Dashboard ANAC</title>
+    <link rel="stylesheet" href="hackaDash.css">
+</head>
+<body>
+
+    <div style="width: 100%; text-align: right; margin-top: 15px;">
+    <a href="#" id="logout-btn" style="color: var(--red); text-decoration: none; font-size: 0.85rem; font-weight: bold; display: inline-block;">
+         Déconnexion 
+    </a>
+</div>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo-zone">
+                    <span class="logo-icon">🛡️</span>
+                    <span class="logo-text">AeroSafe <span class="accent-text">AI</span></span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="#" class="nav-item active">📊 Dashboard</a>
+                    <a href="HackMétéo.html" class="nav-item">🌤️ Station Météo</a>
+                    <a href="hackComp.html" class="nav-item">✈️ Compagnies</a>
+                </nav>
+            </div>
+            <div class="sidebar-bottom">
+                <div class="user-profile">
+                    <div class="avatar">ANAC</div>
+                    <div class="user-info">
+                        <p class="user-role">Superviseur</p>
+                        <p class="user-status">Session active</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div>
+                    <h1>Supervision Globale du Trafic</h1>
+                    <p class="subtitle">Données traitées en amont par le noyau prédictif.</p>
+                </div>
+                <div class="api-badge">
+                    <span class="badge-pulse"></span>
+                    Système Local Connecté
+                </div>
+            </header>
+
+            <section class="kpi-container">
+                <div class="kpi-card">
+                    <div>
+                        <p class="kpi-label">Vols Totalisés</p>
+                        <h3 class="kpi-value" id="total-vols">0</h3>
+                    </div>
+                    <div class="kpi-icon">✈️</div>
+                </div>
+                <div class="kpi-card border-red">
+                    <div>
+                        <p class="kpi-label">Alertes Critiques</p>
+                        <h3 class="kpi-value text-red" id="total-alertes-rouges">0</h3>
+                    </div>
+                    <div class="kpi-icon icon-red">⚠️</div>
+                </div>
+                <div class="kpi-card border-green">
+                    <div>
+                        <p class="kpi-label">Vols Sécurisés</p>
+                        <h3 class="kpi-value text-green" id="total-vols-verts">0</h3>
+                    </div>
+                    <div class="kpi-icon icon-green">✅</div>
+                </div>
+            </section>
+
+            <section class="table-container">
+                <div class="table-header">
+                    <h2>Flux des vols en temps réel</h2>
+                    <span class="table-tag">Code couleur strict</span>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>N° Vol</th>
+                                <th>Compagnie</th>
+                                <th>Destination</th>
+                                <th>Heure Départ</th>
+                                <th>Risque (IA)</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vols-tbody">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+   
+
+    <script src="hackaDash.js"></script>
+</body>
+</html>

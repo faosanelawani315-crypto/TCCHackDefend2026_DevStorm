@@ -1,0 +1,90 @@
+ 
+ <!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroSafe AI - Espace Dispatcher</title>
+    <link rel="stylesheet" href="hackComp.css">
+</head>
+<body>
+     <div style="width: 100%; text-align: right; margin-top: 15px;">
+    <a href="#" id="logout-btn" style="color: var(--red); text-decoration: none; font-size: 0.85rem; font-weight: bold; display: inline-block;">
+         Déconnexion 
+    </a>
+</div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo-zone">
+                    <span class="logo-icon">🛡️</span>
+                    <span class="logo-text">AeroSafe <span class="accent-text">AI</span></span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="hackaDash.html" class="nav-item">📊 Dashboard</a>
+                    <a href="HackMétéo.html" class="nav-item">🌤️ Station Météo</a>
+                    <a href="#" class="nav-item active">✈️ Compagnies</a>
+                </nav>
+            </div>
+            <div class="sidebar-bottom">
+                <div class="user-profile">
+                    <div class="avatar">DIS</div>
+                    <div class="user-info">
+                        <p class="user-role">Agent Dispatcher</p>
+                        <p class="user-status">Régulation Vols</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div>
+                    <h1>Gestion Logistique des Vols</h1>
+                    <p class="subtitle">Filtrez votre flotte et ajustez les statuts selon les recommandations de l'IA.</p>
+                </div>
+                
+                <div class="filter-zone">
+                    <label for="compagnie-filter" style="margin-right: 10px;">Compagnie :</label>
+                    <select id="compagnie-filter" style="width: 180px; padding: 8px 12px;">
+                        <option value="TOUS">Toutes les flottes</option>
+                        <option value="ASKY">ASKY Airlines</option>
+                        <option value="Air France">Air France</option>
+                        <option value="Ethiopian">Ethiopian Airlines</option>
+                    </select>
+                </div>
+            </header>
+
+            <div id="action-feedback" class="form-feedback success hidden" style="margin-bottom: 20px;"></div>
+
+            <section class="table-container">
+                <div class="table-header">
+                    <h2>Vols sous votre responsabilité</h2>
+                    <span class="table-tag">Actions d'ajustement autorisées</span>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>N° Vol</th>
+                                <th>Compagnie</th>
+                                <th>Destination</th>
+                                <th>Heure</th>
+                                <th>Indice de Risque</th>
+                                <th>Statut Actuel</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dispatcher-tbody">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+
+    <script src="hackComp.js"></script>
+</body>
+</html>

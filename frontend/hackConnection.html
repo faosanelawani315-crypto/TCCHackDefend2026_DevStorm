@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroSafe AI - Authentification</title>
+    <link rel="stylesheet" href="hackConnection.css">
+    <style>
+        /* Positionnement spécifique pour l'écran de Login */
+        .login-bg {
+            background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            animation: loginFadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-brand {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-brand .logo-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        @keyframes loginFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="login-bg">
+
+    <div class="login-container">
+        
+        <div class="login-brand">
+            <span class="logo-icon">🛡️</span>
+            <h1 style="font-size: 1.8rem; font-weight: 800;">AeroSafe <span class="accent-text">AI</span></h1>
+            <p class="subtitle" style="font-size: 0.85rem;">Système d'Authentification Unique de l'ANAC</p>
+        </div>
+
+        <div class="form-container">
+            <div class="form-header" style="text-align: center;">
+                <h2>Connexion Passerelle Sécurisée</h2>
+            </div>
+
+            <form id="login-form" class="custom-form">
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="login-id">Identifiant professionnel</label>
+                    <input type="text" id="login-id" placeholder="Ex: super.lome" autocomplete="username" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="login-password">Mot de passe</label>
+                    <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required 
+                           style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-glass); color: white; padding: 14px 16px; border-radius: 10px; font-size: 0.95rem; outline: none; width: 100%;">
+                </div>
+
+                <div id="login-error" class="form-feedback hidden" style="background: rgba(248, 113, 113, 0.08); color: var(--red); border: 1px solid rgba(248, 113, 113, 0.2); margin-top: 5px; margin-bottom: 15px; padding: 10px;">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem; margin-top: 10px;">
+                    S'authentifier
+                </button>
+            </form>
+        </div>
+
+        <div style="text-align: center; margin-top: 25px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
+            <p>Accès strictement réservé au personnel navigant et administratif.</p>
+            <p style="margin-top: 5px; color: #475569;">Comptes de test : super.lome | meteo.lome | dispatch.lome</p>
+        </div>
+
+    </div>
+    <a href="#" id="logout-btn" style="color: var(--red); text-decoration: none; font-size: 0.85rem; font-weight: bold; margin-top: 15px; display: block; text-align: center; border: 1px dashed rgba(248, 113, 113, 0.3); padding: 8px; border-radius: 8px; transition: 0.2s;">
+        Retour
+    </a>
+    
+    <script src="hackConnection.js"></script>
+</body>
+</html>

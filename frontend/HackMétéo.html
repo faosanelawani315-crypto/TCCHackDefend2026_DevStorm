@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroSafe AI - Station Météo</title>
+    <link rel="stylesheet" href="hackMeteo.css">
+</head>
+<body>
+
+    <div style="width: 100%; text-align: right; margin-top: 15px;">
+    <a href="#" id="logout-btn" style="color: var(--red); text-decoration: none; font-size: 0.85rem; font-weight: bold; display: inline-block;">
+        ⚠️ Déconnexion 
+    </a>
+</div>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo-zone">
+                    <span class="logo-icon">🛡️</span>
+                    <span class="logo-text">AeroSafe <span class="accent-text">AI</span></span>
+                </div>
+                <nav class="nav-menu">
+                    <a href="hackaDash.html" class="nav-item">📊 Dashboard</a>
+                    <a href="#" class="nav-item active">🌤️ Station Météo</a>
+                    <a href="hackComp.html" class="nav-item">✈️ Compagnies</a>
+                </nav>
+            </div>
+            <div class="sidebar-bottom">
+                <div class="user-profile">
+                    <div class="avatar">MET</div>
+                    <div class="user-info">
+                        <p class="user-role">Agent Météo</p>
+                        <p class="user-status">Station Lomé (LFW)</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content flex-center">
+            <div class="center-wrapper">
+                
+                <header class="main-header">
+                    <div>
+                        <h1>Saisie des Rapports Climatiques</h1>
+                        <p class="subtitle">Mise à jour en temps réel des facteurs de risque environnementaux.</p>
+                    </div>
+                </header>
+
+                <section class="form-container">
+                    <div class="form-header">
+                        <h2>Nouveau relevé météorologique</h2>
+                    </div>
+                    
+                    <form id="meteo-form" class="custom-form">
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label for="vent-vitesse">Vitesse du vent (en nœuds)</label>
+                                <input type="number" id="vent-vitesse" min="0" max="150" placeholder="Ex: 25" required>
+                                <small class="input-help">Seuil critique ANAC : > 35 nœuds</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="vent-direction">Direction du vent</label>
+                                <select id="vent-direction" required>
+                                    <option value="" disabled selected>Choisir une direction</option>
+                                    <option value="N">Nord (N)</option>
+                                    <option value="NE">Nord-Est (NE)</option>
+                                    <option value="E">Est (E)</option>
+                                    <option value="SE">Sud-Est (SE)</option>
+                                    <option value="S">Sud (S)</option>
+                                    <option value="SO">Sud-Ouest (SO)</option>
+                                    <option value="O">Ouest (O)</option>
+                                    <option value="NO">Nord-Ouest (NO)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label for="visibilite">Portée visuelle / Visibilité (en km)</label>
+                                <input type="number" id="visibilite" min="0" max="20" step="0.1" placeholder="Ex: 4.5" required>
+                                <small class="input-help">Seuil d'alerte : < 5 km</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="precipitations">Précipitations (en mm/h)</label>
+                                <input type="number" id="precipitations" min="0" max="200" placeholder="Ex: 12" required>
+                            </div>
+                        </div>
+
+                        <div id="form-feedback" class="form-feedback hidden"></div>
+
+                        <div class="form-actions">
+                            <button type="reset" class="btn btn-secondary">Réinitialiser</button>
+                            <button type="submit" class="btn btn-primary">Transmettre au Noyau IA</button>
+                        </div>
+                    </form>
+                </section>
+
+            </div>
+        </main>
+    </div>
+    
+
+
+    
+    
+</div>
+    <script src="hackMeteo.js"></script>
+</body>
+</html>

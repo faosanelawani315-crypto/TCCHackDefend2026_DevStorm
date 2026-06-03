@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroSafe AI - Information Passagers</title>
+    <link rel="stylesheet" href="hackPassag.css">
+    <style>
+        /* Ajustements dédiés à l'interface publique passager */
+        .public-bg {
+            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Aligne le contenu vers le haut pour éviter le chevauchement */
+            padding: 40px 20px;
+            min-height: 100vh;
+            overflow-y: auto; /* Permet le défilement si le contenu dépasse */
+        }
+        
+        .search-hero {
+            text-align: center;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+        
+        .search-box {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 500px;
+            z-index: 5; /* Assure que la boîte reste accessible */
+        }
+        
+        .big-input {
+            font-size: 1.5rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            border: 2px solid #475569 !important;
+        }
+
+        /* Conteneur de résultat optimisé pour le premier plan */
+        .result-card {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 500px;
+            z-index: 10; /* Passe au premier plan absolu */
+            animation: fadeInVisual 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeInVisual {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="public-bg">
+
+    <div style="width: 100%; text-align: right; margin-top: 15px;">
+    <a href="#" id="logout-btn" style="color: var(--red); text-decoration: none; font-size: 0.85rem; font-weight: bold; display: inline-block;">
+         Déconnexion 
+    </a>
+</div>
+
+    <div class="search-hero">
+        <h1 style="font-size: 2.3rem; margin-bottom: 12px;">Voyagez en toute <span class="accent-text">Confiance</span></h1>
+        <p class="subtitle">Consultez l'indice de sécurité de votre vol généré par l'Intelligence Artificielle de l'ANAC.</p>
+    </div>
+
+    <div class="search-box">
+        <form id="search-flight-form">
+            <div class="form-group">
+                <label for="flight-number" style="text-align: center; display: block; font-weight: 600;">Entrez votre numéro de vol</label>
+                <input type="text" id="flight-number" class="big-input" placeholder="Ex: KP023" autocomplete="off" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem; margin-top: 15px;">
+                Analyser la sécurité du vol
+            </button>
+        </form>
+    </div>
+
+    <div id="flight-result" class="result-card hidden">
+        <div class="kpi-card" id="card-color-output" style="flex-direction: column; text-align: center; padding: 30px; border-width: 2px; background-color: #1e293b;">
+            <p id="res-flight-id" style="font-weight: bold; color: var(--cyan); letter-spacing: 1.5px; font-size: 1.1rem;"></p>
+            <h2 id="res-dest" style="margin: 10px 0; color: #ffffff;"></h2>
+            
+            <div style="margin: 20px 0;">
+                <p class="kpi-label" style="font-size: 0.85rem; ">Indice de Risque IA</p>
+                <div class="kpi-value" id="res-risk" style="font-size: 3.8rem; font-weight: 800; margin-top: 5px;">0%</div>
+            </div>
+
+            <div class="status-badge" id="res-badge" style="padding: 8px 20px; font-size: 0.95rem; letter-spacing: 0.5px;"></div>
+            
+            <p id="res-desc" style="margin-top: 22px; font-size: 0.95rem; color: #cbd5e1; line-height: 1.6; text-align: center;"></p>
+        </div>
+        
+        <p style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: var(--text-muted);">
+            * Analyse prédictive basée sur les derniers bulletins météo et logistiques.
+        </p>
+    </div>
+    
+    <script src="hackPassag.js"></script>
+</body>
+</html>
