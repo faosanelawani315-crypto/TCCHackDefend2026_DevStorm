@@ -1,116 +1,111 @@
-// --- SÉCURISATION ET CONTRÔLE D'ACCÈS ---
+// ============================================================
+// hackMeteo.js — Agent Météo
+// Connecté au backend Flask via POST /api/predict
+// ============================================================
+
+// URL de base du microservice IA (à modifier si le backend tourne sur un autre port/host)
+const API_BASE = "http://localhost:5000";
+
+// Vérification d'accès : seul l'agent météo peut accéder à cette page
 (function verifierAcces() {
     const role = localStorage.getItem("userRole");
-    
-    // Si aucun utilisateur n'est connecté OU si ce n'est pas l'agent météo (ni le superviseur qui a tous les droits)
-    if (!role || (role !== "meteo" && role !== "superviseur")) {
-        alert("Accès refusé. Vous devez vous authentifier en tant qu'Agent Météo.");
-        window.location.href = "login.html";
+    if (!role || role !== "meteo") {
+        alert("Accès restreint. Identification Agent Météo requise.");
+        window.location.href = "hackConnection.html";
     }
 })();
 
-// --- LOGIQUE DE LA PAGE ---
-document.addEventListener("DOMContentLoaded", () => {
-    // Optionnel : Vous pouvez afficher dynamiquement le vrai nom stocké
-    const userRoleText = document.querySelector(".user-role");
-    if (userRoleText && localStorage.getItem("userName")) {
-        userRoleText.innerText = localStorage.getItem("userName");
+// Récupère les éléments d'interface
+const form = document.getElementById("meteo-form");
+const feedbackZone = document.getElementById("form-feedback");
+const resultZone = document.getElementById("result-zone");
+
+// Soumission du formulaire — envoi réel vers Flask
+form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    // Lecture des valeurs du formulaire
+    const visibilite    = parseFloat(document.getElementById("visibilite").value);
+    const vitesseVent   = parseFloat(document.getElementById("vitesse-vent").value);
+    const precipitation = parseFloat(document.getElementById("precipitation").value);
+    const heureVolRaw   = document.getElementById("heure-vol").value; // format : "YYYY-MM-DDTHH:MM"
+    const numVol        = document.getElementById("num-vol").value.trim().toUpperCase();
+
+    // Conversion en ISO 8601 avec fuseau UTC
+    const heure_vol = heureVolRaw + ":00+00:00";
+
+    // Affichage d'un état de chargement
+    feedbackZone.className = "form-feedback";
+    feedbackZone.innerText = "⏳ Analyse en cours...";
+    feedbackZone.classList.remove("hidden");
+    if (resultZone) resultZone.classList.add("hidden");
+
+    try {
+        const response = await fetch(`${API_BASE}/api/predict`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ visibilite, vitesseVent, precipitation, heure_vol })
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.erreur || `Erreur HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        afficherResultatMeteo(data, numVol);
+
+    } catch (error) {
+        feedbackZone.className = "form-feedback";
+        feedbackZone.style.background = "rgba(239, 68, 68, 0.08)";
+        feedbackZone.style.color = "var(--red)";
+        feedbackZone.style.border = "1px solid rgba(239, 68, 68, 0.2)";
+        feedbackZone.innerText = `❌ Erreur de connexion au service IA : ${error.message}`;
     }
-
-    const form = document.getElementById("meteo-form");
-    form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        
-        const donneesMeteo = {
-            vitesseVent: parseFloat(document.getElementById("vent-vitesse").value),
-            directionVent: document.getElementById("vent-direction").value,
-            visibilite: parseFloat(document.getElementById("visibilite").value),
-            precipitations: parseFloat(document.getElementById("precipitations").value),
-            agent: localStorage.getItem("userName"), // On sait quel agent a saisi la donnée
-            dateSaisie: new Date().toISOString()
-        };
-
-        transmettreDonnees(donneesMeteo);
-    });
 });
 
-function transmettreDonnees(data) {
-    const feedback = document.getElementById("form-feedback");
-    feedback.classList.remove("hidden");
-    feedback.className = "form-feedback success";
-    feedback.innerText = "⚡ Données climatiques transmises avec succès au Noyau IA.";
+/**
+ * Affiche le résultat de l'analyse de risque retourné par l'API Flask.
+ * @param {Object} data - { score, niveau, causes }
+ * @param {string} numVol - numéro de vol saisi par l'agent
+ */
+function afficherResultatMeteo(data, numVol) {
+    const { score, niveau, causes } = data;
 
-    console.log("Données enregistrées sous la session :", data);
+    // Mise à jour du feedback textuel
+    feedbackZone.className = "form-feedback success";
+    feedbackZone.style = ""; // Reset des styles inline d'erreur
+    feedbackZone.innerText = `✅ Analyse transmise pour le vol ${numVol || "—"}. Score IA : ${score}% (${niveau})`;
 
-    setTimeout(() => {
-        document.getElementById("meteo-form").reset();
-        feedback.classList.add("hidden");
-    }, 3000);
+    // Si une zone de résultat existe dans le HTML, la remplir
+    if (resultZone) {
+        resultZone.classList.remove("hidden");
+
+        const scoreEl = document.getElementById("result-score");
+        const niveauEl = document.getElementById("result-niveau");
+        const causesEl = document.getElementById("result-causes");
+
+        if (scoreEl) scoreEl.innerText = score + "%";
+        if (causesEl) causesEl.innerText = causes;
+
+        if (niveauEl) {
+            niveauEl.innerText = niveau;
+            niveauEl.className = "status-badge " + (
+                niveau === "VERT"   ? "badge-green" :
+                niveau === "ORANGE" ? "badge-amber"  : "badge-red"
+            );
+        }
+    }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("meteo-form");
-    
-    form.addEventListener("submit", (e) => {
-        // Empêche le rechargement de la page
-        e.preventDefault();
-
-        // Récupération des données saisies par l'agent
-        const donneesMeteo = {
-            vitesseVent: parseFloat(document.getElementById("vent-vitesse").value),
-            directionVent: document.getElementById("vent-direction").value,
-            visibilite: parseFloat(document.getElementById("visibilite").value),
-            precipitations: parseFloat(document.getElementById("precipitations").value),
-            dateSaisie: new Date().toISOString()
-        };
-
-        // Simulation de traitement (En attente de connexion avec l'API Flask/FastAPI)
-        transmettreDonnees(donneesMeteo);
-    });
-});
-
-function transmettreDonnees(data) {
-    const feedback = document.getElementById("form-feedback");
-    
-    // On affiche un retour visuel positif à l'agent météo
-    feedback.classList.remove("hidden");
-    feedback.className = "form-feedback success";
-    feedback.innerText = "⚡ Données climatiques transmises avec succès. Calcul des indices de risques IA en cours...";
-
-    console.log("Données prêtes à être envoyées en POST JSON :", data);
-
-    // Optionnel : Réinitialiser le formulaire après 2 secondes
-    setTimeout(() => {
-        document.getElementById("meteo-form").reset();
-        feedback.classList.add("hidden");
-    }, 3000);
-}
-
-const logoutBtn = document.getElementById("logout-btn");
-if (logoutBtn) {
-    logoutBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        localStorage.clear(); // Efface les jetons de session
-        window.location.href = "login.html"; // Renvoie au login
-    });
-}
-
-// --- GESTION DE LA DÉCONNEXION ---
+// Gestion de la déconnexion
 document.addEventListener("DOMContentLoaded", () => {
     const logoutBtn = document.getElementById("logout-btn");
-    
     if (logoutBtn) {
         logoutBtn.addEventListener("click", (e) => {
-            // Empêche le comportement par défaut du lien (#)
-            e.preventDefault(); 
-            
-            // 1. Vide la session (supprime le rôle et le nom de l'agent)
-            localStorage.clear(); 
-            
-            console.log("Session effacée. Redirection vers l'écran de connexion...");
-            
-            // 2. Renvoie directement à la page de connexion dans le même dossier
-            window.location.href = "hackAcceuil.html"; 
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = "hackAcceuil.html";
         });
     }
 });

@@ -23,7 +23,7 @@ def home():
         "status": "running"
     }
 
-@app.post("/predict")
+@app.post("../frontend/hackPassag?search-flight-form")
 def predict(
     request: FlightRequest
 ):

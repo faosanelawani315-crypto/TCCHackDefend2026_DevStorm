@@ -5,6 +5,7 @@
 📁 AeroSafe-AI/ (Racine)
     📄 .gitignore
     📄 docker-compose.yml
+    📄 model_evaluation.ipynb
     📄 requirements.txt
     📁 .github/
         📁 workflows/
@@ -267,6 +268,448 @@
 ============================================================
 
 
+
+============================================================
+=== FICHIER : model_evaluation.ipynb
+============================================================
+
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMYWKEl53VRHClwgnObyu9R",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/lonehuntress/AeroSafe-AI/blob/main/model_evaluation.ipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 18,
+      "metadata": {
+        "id": "7WD5_DoikThE"
+      },
+      "outputs": [],
+      "source": [
+        "import pandas as pd\n",
+        "import joblib"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from google.colab import drive\n",
+        "drive.mount('/content/drive')\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "5MgdGKMFcIyI",
+        "outputId": "d6595088-0356-4382-c9bf-33a9fcdd5267"
+      },
+      "execution_count": 19,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Drive already mounted at /content/drive; to attempt to forcibly remount, call drive.mount(\"/content/drive\", force_remount=True).\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_test = pd.read_csv(\"/content/drive/MyDrive/AeroSafeAI/X_test.csv\")\n",
+        "y_test = pd.read_csv(\"/content/drive/MyDrive/AeroSafeAI/y_test.csv\")"
+      ],
+      "metadata": {
+        "id": "hKsjaUbhrevf"
+      },
+      "execution_count": 20,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from google.colab import files\n",
+        "import joblib\n",
+        "\n",
+        "model = joblib.load(\"/content/drive/MyDrive/AeroSafeAI/models/aerosafe_model1.pkl\")\n",
+        "print(\"Fin !\")"
+      ],
+      "metadata": {
+        "id": "c-pFz-LZrzFr",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "b42edde2-0634-4720-8653-b1b9d27af25d"
+      },
+      "execution_count": 21,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Fin !\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "predictions = model.predict(X_test)"
+      ],
+      "metadata": {
+        "id": "mogteKDDr_ee"
+      },
+      "execution_count": 22,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.metrics import (\n",
+        "    accuracy_score,\n",
+        "    precision_score,\n",
+        "    recall_score,\n",
+        "    f1_score,\n",
+        "    confusion_matrix,\n",
+        "    classification_report\n",
+        ")"
+      ],
+      "metadata": {
+        "id": "-wC7eELPsC3W"
+      },
+      "execution_count": 23,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "accuracy = accuracy_score(y_test, predictions)\n",
+        "\n",
+        "precision = precision_score(y_test, predictions)\n",
+        "\n",
+        "recall = recall_score(y_test, predictions)\n",
+        "\n",
+        "f1 = f1_score(y_test, predictions)"
+      ],
+      "metadata": {
+        "id": "sLpKTwkysF0S"
+      },
+      "execution_count": 24,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(\"Accuracy :\", accuracy)\n",
+        "print(\"Precision :\", precision)\n",
+        "print(\"Recall :\", recall)\n",
+        "print(\"F1 Score :\", f1)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "keecNalhsJAZ",
+        "outputId": "6b19e709-110a-473f-fd3e-9d4b0b389ad1"
+      },
+      "execution_count": 25,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Accuracy : 0.809249503014716\n",
+            "Precision : 0.6754516282386499\n",
+            "Recall : 0.09301478711303508\n",
+            "F1 Score : 0.16351264844025348\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "cm = confusion_matrix(\n",
+        "    y_test,\n",
+        "    predictions\n",
+        ")\n",
+        "\n",
+        "print(cm)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Aj5HLGO4sLTy",
+        "outputId": "44769a69-8b06-49e2-9f3a-ca66c4ca6a21"
+      },
+      "execution_count": 26,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "[[964027  10923]\n",
+            " [221669  22733]]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(\n",
+        "    classification_report(\n",
+        "        y_test,\n",
+        "        predictions\n",
+        "    )\n",
+        ")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "BENKt3GmsOm4",
+        "outputId": "6447d5ee-f51b-4e39-daab-d2a6fbb74869"
+      },
+      "execution_count": 27,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "              precision    recall  f1-score   support\n",
+            "\n",
+            "           0       0.81      0.99      0.89    974950\n",
+            "           1       0.68      0.09      0.16    244402\n",
+            "\n",
+            "    accuracy                           0.81   1219352\n",
+            "   macro avg       0.74      0.54      0.53   1219352\n",
+            "weighted avg       0.79      0.81      0.75   1219352\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X_test.head(1)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 101
+        },
+        "id": "0G8SfkJntyB_",
+        "outputId": "0fb9fd55-1b38-4956-f037-851d0e2c6b6e"
+      },
+      "execution_count": 28,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "   YEAR  MONTH   DAY  DAY_OF_WEEK  ORIGIN_AIRPORT  DESTINATION_AIRPORT  \\\n",
+              "0  2015    1.0  13.0          2.0             159                   84   \n",
+              "\n",
+              "   SCHEDULED_DEPARTURE  SCHEDULED_TIME  ELAPSED_TIME  DISTANCE  \\\n",
+              "0                 1643            97.0          85.0     408.0   \n",
+              "\n",
+              "   SCHEDULED_ARRIVAL  HOUR  VISIBILITY  WIND_SPEED  TEMPERATURE  PRECIPITATION  \n",
+              "0             1820.0    16      1207.0        31.0          6.7            0.0  "
+            ],
+            "text/html": [
+              "\n",
+              "  <div id=\"df-0aa458bc-2682-4a41-8df9-35f7e5a13a98\" class=\"colab-df-container\">\n",
+              "    <div>\n",
+              "<style scoped>\n",
+              "    .dataframe tbody tr th:only-of-type {\n",
+              "        vertical-align: middle;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe tbody tr th {\n",
+              "        vertical-align: top;\n",
+              "    }\n",
+              "\n",
+              "    .dataframe thead th {\n",
+              "        text-align: right;\n",
+              "    }\n",
+              "</style>\n",
+              "<table border=\"1\" class=\"dataframe\">\n",
+              "  <thead>\n",
+              "    <tr style=\"text-align: right;\">\n",
+              "      <th></th>\n",
+              "      <th>YEAR</th>\n",
+              "      <th>MONTH</th>\n",
+              "      <th>DAY</th>\n",
+              "      <th>DAY_OF_WEEK</th>\n",
+              "      <th>ORIGIN_AIRPORT</th>\n",
+              "      <th>DESTINATION_AIRPORT</th>\n",
+              "      <th>SCHEDULED_DEPARTURE</th>\n",
+              "      <th>SCHEDULED_TIME</th>\n",
+              "      <th>ELAPSED_TIME</th>\n",
+              "      <th>DISTANCE</th>\n",
+              "      <th>SCHEDULED_ARRIVAL</th>\n",
+              "      <th>HOUR</th>\n",
+              "      <th>VISIBILITY</th>\n",
+              "      <th>WIND_SPEED</th>\n",
+              "      <th>TEMPERATURE</th>\n",
+              "      <th>PRECIPITATION</th>\n",
+              "    </tr>\n",
+              "  </thead>\n",
+              "  <tbody>\n",
+              "    <tr>\n",
+              "      <th>0</th>\n",
+              "      <td>2015</td>\n",
+              "      <td>1.0</td>\n",
+              "      <td>13.0</td>\n",
+              "      <td>2.0</td>\n",
+              "      <td>159</td>\n",
+              "      <td>84</td>\n",
+              "      <td>1643</td>\n",
+              "      <td>97.0</td>\n",
+              "      <td>85.0</td>\n",
+              "      <td>408.0</td>\n",
+              "      <td>1820.0</td>\n",
+              "      <td>16</td>\n",
+              "      <td>1207.0</td>\n",
+              "      <td>31.0</td>\n",
+              "      <td>6.7</td>\n",
+              "      <td>0.0</td>\n",
+              "    </tr>\n",
+              "  </tbody>\n",
+              "</table>\n",
+              "</div>\n",
+              "    <div class=\"colab-df-buttons\">\n",
+              "\n",
+              "  <div class=\"colab-df-container\">\n",
+              "    <button class=\"colab-df-convert\" onclick=\"convertToInteractive('df-0aa458bc-2682-4a41-8df9-35f7e5a13a98')\"\n",
+              "            title=\"Convert this dataframe to an interactive table.\"\n",
+              "            style=\"display:none;\">\n",
+              "\n",
+              "  <svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\">\n",
+              "    <path d=\"M120-120v-720h720v720H120Zm60-500h600v-160H180v160Zm220 220h160v-160H400v160Zm0 220h160v-160H400v160ZM180-400h160v-160H180v160Zm440 0h160v-160H620v160ZM180-180h160v-160H180v160Zm440 0h160v-160H620v160Z\"/>\n",
+              "  </svg>\n",
+              "    </button>\n",
+              "\n",
+              "  <style>\n",
+              "    .colab-df-container {\n",
+              "      display:flex;\n",
+              "      gap: 12px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert {\n",
+              "      background-color: #E8F0FE;\n",
+              "      border: none;\n",
+              "      border-radius: 50%;\n",
+              "      cursor: pointer;\n",
+              "      display: none;\n",
+              "      fill: #1967D2;\n",
+              "      height: 32px;\n",
+              "      padding: 0 0 0 0;\n",
+              "      width: 32px;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-convert:hover {\n",
+              "      background-color: #E2EBFA;\n",
+              "      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);\n",
+              "      fill: #174EA6;\n",
+              "    }\n",
+              "\n",
+              "    .colab-df-buttons div {\n",
+              "      margin-bottom: 4px;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert {\n",
+              "      background-color: #3B4455;\n",
+              "      fill: #D2E3FC;\n",
+              "    }\n",
+              "\n",
+              "    [theme=dark] .colab-df-convert:hover {\n",
+              "      background-color: #434B5C;\n",
+              "      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);\n",
+              "      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));\n",
+              "      fill: #FFFFFF;\n",
+              "    }\n",
+              "  </style>\n",
+              "\n",
+              "    <script>\n",
+              "      const buttonEl =\n",
+              "        document.querySelector('#df-0aa458bc-2682-4a41-8df9-35f7e5a13a98 button.colab-df-convert');\n",
+              "      buttonEl.style.display =\n",
+              "        google.colab.kernel.accessAllowed ? 'block' : 'none';\n",
+              "\n",
+              "      async function convertToInteractive(key) {\n",
+              "        const element = document.querySelector('#df-0aa458bc-2682-4a41-8df9-35f7e5a13a98');\n",
+              "        const dataTable =\n",
+              "          await google.colab.kernel.invokeFunction('convertToInteractive',\n",
+              "                                                    [key], {});\n",
+              "        if (!dataTable) return;\n",
+              "\n",
+              "        const docLinkHtml = 'Like what you see? Visit the ' +\n",
+              "          '<a target=\"_blank\" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'\n",
+              "          + ' to learn more about interactive tables.';\n",
+              "        element.innerHTML = '';\n",
+              "        dataTable['output_type'] = 'display_data';\n",
+              "        await google.colab.output.renderOutput(dataTable, element);\n",
+              "        const docLink = document.createElement('div');\n",
+              "        docLink.innerHTML = docLinkHtml;\n",
+              "        element.appendChild(docLink);\n",
+              "      }\n",
+              "    </script>\n",
+              "  </div>\n",
+              "\n",
+              "\n",
+              "    </div>\n",
+              "  </div>\n"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "dataframe",
+              "variable_name": "X_test"
+            }
+          },
+          "metadata": {},
+          "execution_count": 28
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "1f3twT8bLH_Z"
+      },
+      "execution_count": 28,
+      "outputs": []
+    }
+  ]
+}
 
 ============================================================
 === FICHIER : requirements.txt
@@ -1178,7 +1621,7 @@ def home():
         "status": "running"
     }
 
-@app.post("/predict")
+@app.post("../frontend/hackPassag?search-flight-form")
 def predict(
     request: FlightRequest
 ):
@@ -11047,7 +11490,7 @@ Disallow:
     "colab": {
       "provenance": [],
       "mount_file_id": "1pBSSaugmcDmGjJub9Yo-OGHYm3bh3htB",
-      "authorship_tag": "ABX9TyONgGJts6NApSDH54ljQK5q",
+      "authorship_tag": "ABX9TyM9JOumk/JCbZWyzZr8sbDY",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -11071,7 +11514,7 @@ Disallow:
     },
     {
       "cell_type": "code",
-      "execution_count": 1,
+      "execution_count": 60,
       "metadata": {
         "id": "aBHxmWeiQNwz"
       },
@@ -11098,15 +11541,15 @@ Disallow:
           "base_uri": "https://localhost:8080/"
         },
         "id": "5MgdGKMFcIyI",
-        "outputId": "63967c4f-feb4-4be0-84c7-7134de3e0263"
+        "outputId": "6ce43729-d589-46ce-ac43-1cdfb4a1a490"
       },
-      "execution_count": 3,
+      "execution_count": 61,
       "outputs": [
         {
           "output_type": "stream",
           "name": "stdout",
           "text": [
-            "Mounted at /content/drive\n"
+            "Drive already mounted at /content/drive; to attempt to forcibly remount, call drive.mount(\"/content/drive\", force_remount=True).\n"
           ]
         }
       ]
@@ -11123,8 +11566,33 @@ Disallow:
       "metadata": {
         "id": "BWmqEkiie1Pm"
       },
-      "execution_count": 7,
+      "execution_count": 62,
       "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(X_train.shape)\n",
+        "print(X_test.shape)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "797kMIilCgeH",
+        "outputId": "dd62677c-77d6-45dd-dc1c-23d491926964"
+      },
+      "execution_count": 63,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "(4877406, 16)\n",
+            "(1219352, 16)\n"
+          ]
+        }
+      ]
     },
     {
       "cell_type": "code",
@@ -11134,23 +11602,24 @@ Disallow:
       "metadata": {
         "id": "clyAa6eFfhNJ"
       },
-      "execution_count": 8,
+      "execution_count": 64,
       "outputs": []
     },
     {
       "cell_type": "code",
       "source": [
         "model = XGBClassifier(\n",
-        "    n_estimators=200,\n",
-        "    max_depth=6,\n",
-        "    learning_rate=0.1,\n",
+        "    n_estimators=300,\n",
+        "    max_depth=8,\n",
+        "    learning_rate=0.05,\n",
+        "    scale_pos_weight=4,\n",
         "    random_state=42\n",
         ")"
       ],
       "metadata": {
         "id": "7cPp71-cf8Rv"
       },
-      "execution_count": 9,
+      "execution_count": 65,
       "outputs": []
     },
     {
@@ -11167,9 +11636,9 @@ Disallow:
           "height": 254
         },
         "id": "SQ8G4On1f_M4",
-        "outputId": "36e8d80a-6a8e-4ec6-c79e-54625442ceb8"
+        "outputId": "ca8c0b2d-58a3-4521-a4d5-d2746ea86e15"
       },
-      "execution_count": 10,
+      "execution_count": 66,
       "outputs": [
         {
           "output_type": "execute_result",
@@ -11181,14 +11650,14 @@ Disallow:
               "              enable_categorical=False, eval_metric=None, feature_types=None,\n",
               "              feature_weights=None, gamma=None, grow_policy=None,\n",
               "              importance_type=None, interaction_constraints=None,\n",
-              "              learning_rate=0.1, max_bin=None, max_cat_threshold=None,\n",
-              "              max_cat_to_onehot=None, max_delta_step=None, max_depth=6,\n",
+              "              learning_rate=0.05, max_bin=None, max_cat_threshold=None,\n",
+              "              max_cat_to_onehot=None, max_delta_step=None, max_depth=8,\n",
               "              max_leaves=None, min_child_weight=None, missing=nan,\n",
-              "              monotone_constraints=None, multi_strategy=None, n_estimators=200,\n",
+              "              monotone_constraints=None, multi_strategy=None, n_estimators=300,\n",
               "              n_jobs=None, num_parallel_tree=None, ...)"
             ],
             "text/html": [
-              "<style>#sk-container-id-1 {\n",
+              "<style>#sk-container-id-5 {\n",
               "  /* Definition of color scheme common for light and dark mode */\n",
               "  --sklearn-color-text: #000;\n",
               "  --sklearn-color-text-muted: #666;\n",
@@ -11219,15 +11688,15 @@ Disallow:
               "  }\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 {\n",
+              "#sk-container-id-5 {\n",
               "  color: var(--sklearn-color-text);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 pre {\n",
+              "#sk-container-id-5 pre {\n",
               "  padding: 0;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 input.sk-hidden--visually {\n",
+              "#sk-container-id-5 input.sk-hidden--visually {\n",
               "  border: 0;\n",
               "  clip: rect(1px 1px 1px 1px);\n",
               "  clip: rect(1px, 1px, 1px, 1px);\n",
@@ -11239,7 +11708,7 @@ Disallow:
               "  width: 1px;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-dashed-wrapped {\n",
+              "#sk-container-id-5 div.sk-dashed-wrapped {\n",
               "  border: 1px dashed var(--sklearn-color-line);\n",
               "  margin: 0 0.4em 0.5em 0.4em;\n",
               "  box-sizing: border-box;\n",
@@ -11247,7 +11716,7 @@ Disallow:
               "  background-color: var(--sklearn-color-background);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-container {\n",
+              "#sk-container-id-5 div.sk-container {\n",
               "  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`\n",
               "     but bootstrap.min.css set `[hidden] { display: none !important; }`\n",
               "     so we also need the `!important` here to be able to override the\n",
@@ -11257,7 +11726,7 @@ Disallow:
               "  position: relative;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-text-repr-fallback {\n",
+              "#sk-container-id-5 div.sk-text-repr-fallback {\n",
               "  display: none;\n",
               "}\n",
               "\n",
@@ -11273,14 +11742,14 @@ Disallow:
               "\n",
               "/* Parallel-specific style estimator block */\n",
               "\n",
-              "#sk-container-id-1 div.sk-parallel-item::after {\n",
+              "#sk-container-id-5 div.sk-parallel-item::after {\n",
               "  content: \"\";\n",
               "  width: 100%;\n",
               "  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);\n",
               "  flex-grow: 1;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-parallel {\n",
+              "#sk-container-id-5 div.sk-parallel {\n",
               "  display: flex;\n",
               "  align-items: stretch;\n",
               "  justify-content: center;\n",
@@ -11288,28 +11757,28 @@ Disallow:
               "  position: relative;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-parallel-item {\n",
+              "#sk-container-id-5 div.sk-parallel-item {\n",
               "  display: flex;\n",
               "  flex-direction: column;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-parallel-item:first-child::after {\n",
+              "#sk-container-id-5 div.sk-parallel-item:first-child::after {\n",
               "  align-self: flex-end;\n",
               "  width: 50%;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-parallel-item:last-child::after {\n",
+              "#sk-container-id-5 div.sk-parallel-item:last-child::after {\n",
               "  align-self: flex-start;\n",
               "  width: 50%;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-parallel-item:only-child::after {\n",
+              "#sk-container-id-5 div.sk-parallel-item:only-child::after {\n",
               "  width: 0;\n",
               "}\n",
               "\n",
               "/* Serial-specific style estimator block */\n",
               "\n",
-              "#sk-container-id-1 div.sk-serial {\n",
+              "#sk-container-id-5 div.sk-serial {\n",
               "  display: flex;\n",
               "  flex-direction: column;\n",
               "  align-items: center;\n",
@@ -11327,14 +11796,14 @@ Disallow:
               "\n",
               "/* Pipeline and ColumnTransformer style (default) */\n",
               "\n",
-              "#sk-container-id-1 div.sk-toggleable {\n",
+              "#sk-container-id-5 div.sk-toggleable {\n",
               "  /* Default theme specific background. It is overwritten whether we have a\n",
               "  specific estimator or a Pipeline/ColumnTransformer */\n",
               "  background-color: var(--sklearn-color-background);\n",
               "}\n",
               "\n",
               "/* Toggleable label */\n",
-              "#sk-container-id-1 label.sk-toggleable__label {\n",
+              "#sk-container-id-5 label.sk-toggleable__label {\n",
               "  cursor: pointer;\n",
               "  display: flex;\n",
               "  width: 100%;\n",
@@ -11347,13 +11816,13 @@ Disallow:
               "  gap: 0.5em;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 label.sk-toggleable__label .caption {\n",
+              "#sk-container-id-5 label.sk-toggleable__label .caption {\n",
               "  font-size: 0.6rem;\n",
               "  font-weight: lighter;\n",
               "  color: var(--sklearn-color-text-muted);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 label.sk-toggleable__label-arrow:before {\n",
+              "#sk-container-id-5 label.sk-toggleable__label-arrow:before {\n",
               "  /* Arrow on the left of the label */\n",
               "  content: \"▸\";\n",
               "  float: left;\n",
@@ -11361,13 +11830,13 @@ Disallow:
               "  color: var(--sklearn-color-icon);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {\n",
+              "#sk-container-id-5 label.sk-toggleable__label-arrow:hover:before {\n",
               "  color: var(--sklearn-color-text);\n",
               "}\n",
               "\n",
               "/* Toggleable content - dropdown */\n",
               "\n",
-              "#sk-container-id-1 div.sk-toggleable__content {\n",
+              "#sk-container-id-5 div.sk-toggleable__content {\n",
               "  max-height: 0;\n",
               "  max-width: 0;\n",
               "  overflow: hidden;\n",
@@ -11376,12 +11845,12 @@ Disallow:
               "  background-color: var(--sklearn-color-unfitted-level-0);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-toggleable__content.fitted {\n",
+              "#sk-container-id-5 div.sk-toggleable__content.fitted {\n",
               "  /* fitted */\n",
               "  background-color: var(--sklearn-color-fitted-level-0);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-toggleable__content pre {\n",
+              "#sk-container-id-5 div.sk-toggleable__content pre {\n",
               "  margin: 0.2em;\n",
               "  border-radius: 0.25em;\n",
               "  color: var(--sklearn-color-text);\n",
@@ -11389,79 +11858,79 @@ Disallow:
               "  background-color: var(--sklearn-color-unfitted-level-0);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-toggleable__content.fitted pre {\n",
+              "#sk-container-id-5 div.sk-toggleable__content.fitted pre {\n",
               "  /* unfitted */\n",
               "  background-color: var(--sklearn-color-fitted-level-0);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {\n",
+              "#sk-container-id-5 input.sk-toggleable__control:checked~div.sk-toggleable__content {\n",
               "  /* Expand drop-down */\n",
               "  max-height: 200px;\n",
               "  max-width: 100%;\n",
               "  overflow: auto;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {\n",
+              "#sk-container-id-5 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {\n",
               "  content: \"▾\";\n",
               "}\n",
               "\n",
               "/* Pipeline/ColumnTransformer-specific style */\n",
               "\n",
-              "#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {\n",
+              "#sk-container-id-5 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {\n",
               "  color: var(--sklearn-color-text);\n",
               "  background-color: var(--sklearn-color-unfitted-level-2);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {\n",
+              "#sk-container-id-5 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {\n",
               "  background-color: var(--sklearn-color-fitted-level-2);\n",
               "}\n",
               "\n",
               "/* Estimator-specific style */\n",
               "\n",
               "/* Colorize estimator box */\n",
-              "#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {\n",
+              "#sk-container-id-5 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {\n",
               "  /* unfitted */\n",
               "  background-color: var(--sklearn-color-unfitted-level-2);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {\n",
+              "#sk-container-id-5 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {\n",
               "  /* fitted */\n",
               "  background-color: var(--sklearn-color-fitted-level-2);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-label label.sk-toggleable__label,\n",
-              "#sk-container-id-1 div.sk-label label {\n",
+              "#sk-container-id-5 div.sk-label label.sk-toggleable__label,\n",
+              "#sk-container-id-5 div.sk-label label {\n",
               "  /* The background is the default theme color */\n",
               "  color: var(--sklearn-color-text-on-default-background);\n",
               "}\n",
               "\n",
               "/* On hover, darken the color of the background */\n",
-              "#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {\n",
+              "#sk-container-id-5 div.sk-label:hover label.sk-toggleable__label {\n",
               "  color: var(--sklearn-color-text);\n",
               "  background-color: var(--sklearn-color-unfitted-level-2);\n",
               "}\n",
               "\n",
               "/* Label box, darken color on hover, fitted */\n",
-              "#sk-container-id-1 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {\n",
+              "#sk-container-id-5 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {\n",
               "  color: var(--sklearn-color-text);\n",
               "  background-color: var(--sklearn-color-fitted-level-2);\n",
               "}\n",
               "\n",
               "/* Estimator label */\n",
               "\n",
-              "#sk-container-id-1 div.sk-label label {\n",
+              "#sk-container-id-5 div.sk-label label {\n",
               "  font-family: monospace;\n",
               "  font-weight: bold;\n",
               "  display: inline-block;\n",
               "  line-height: 1.2em;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-label-container {\n",
+              "#sk-container-id-5 div.sk-label-container {\n",
               "  text-align: center;\n",
               "}\n",
               "\n",
               "/* Estimator-specific */\n",
-              "#sk-container-id-1 div.sk-estimator {\n",
+              "#sk-container-id-5 div.sk-estimator {\n",
               "  font-family: monospace;\n",
               "  border: 1px dotted var(--sklearn-color-border-box);\n",
               "  border-radius: 0.25em;\n",
@@ -11471,18 +11940,18 @@ Disallow:
               "  background-color: var(--sklearn-color-unfitted-level-0);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-estimator.fitted {\n",
+              "#sk-container-id-5 div.sk-estimator.fitted {\n",
               "  /* fitted */\n",
               "  background-color: var(--sklearn-color-fitted-level-0);\n",
               "}\n",
               "\n",
               "/* on hover */\n",
-              "#sk-container-id-1 div.sk-estimator:hover {\n",
+              "#sk-container-id-5 div.sk-estimator:hover {\n",
               "  /* unfitted */\n",
               "  background-color: var(--sklearn-color-unfitted-level-2);\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 div.sk-estimator.fitted:hover {\n",
+              "#sk-container-id-5 div.sk-estimator.fitted:hover {\n",
               "  /* fitted */\n",
               "  background-color: var(--sklearn-color-fitted-level-2);\n",
               "}\n",
@@ -11570,7 +12039,7 @@ Disallow:
               "\n",
               "/* \"?\"-specific style due to the `<a>` HTML tag */\n",
               "\n",
-              "#sk-container-id-1 a.estimator_doc_link {\n",
+              "#sk-container-id-5 a.estimator_doc_link {\n",
               "  float: right;\n",
               "  font-size: 1rem;\n",
               "  line-height: 1em;\n",
@@ -11585,67 +12054,121 @@ Disallow:
               "  border: var(--sklearn-color-unfitted-level-1) 1pt solid;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 a.estimator_doc_link.fitted {\n",
+              "#sk-container-id-5 a.estimator_doc_link.fitted {\n",
               "  /* fitted */\n",
               "  border: var(--sklearn-color-fitted-level-1) 1pt solid;\n",
               "  color: var(--sklearn-color-fitted-level-1);\n",
               "}\n",
               "\n",
               "/* On hover */\n",
-              "#sk-container-id-1 a.estimator_doc_link:hover {\n",
+              "#sk-container-id-5 a.estimator_doc_link:hover {\n",
               "  /* unfitted */\n",
               "  background-color: var(--sklearn-color-unfitted-level-3);\n",
               "  color: var(--sklearn-color-background);\n",
               "  text-decoration: none;\n",
               "}\n",
               "\n",
-              "#sk-container-id-1 a.estimator_doc_link.fitted:hover {\n",
+              "#sk-container-id-5 a.estimator_doc_link.fitted:hover {\n",
               "  /* fitted */\n",
               "  background-color: var(--sklearn-color-fitted-level-3);\n",
               "}\n",
-              "</style><div id=\"sk-container-id-1\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>XGBClassifier(base_score=None, booster=None, callbacks=None,\n",
+              "</style><div id=\"sk-container-id-5\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>XGBClassifier(base_score=None, booster=None, callbacks=None,\n",
               "              colsample_bylevel=None, colsample_bynode=None,\n",
               "              colsample_bytree=None, device=None, early_stopping_rounds=None,\n",
               "              enable_categorical=False, eval_metric=None, feature_types=None,\n",
               "              feature_weights=None, gamma=None, grow_policy=None,\n",
               "              importance_type=None, interaction_constraints=None,\n",
-              "              learning_rate=0.1, max_bin=None, max_cat_threshold=None,\n",
-              "              max_cat_to_onehot=None, max_delta_step=None, max_depth=6,\n",
+              "              learning_rate=0.05, max_bin=None, max_cat_threshold=None,\n",
+              "              max_cat_to_onehot=None, max_delta_step=None, max_depth=8,\n",
               "              max_leaves=None, min_child_weight=None, missing=nan,\n",
-              "              monotone_constraints=None, multi_strategy=None, n_estimators=200,\n",
-              "              n_jobs=None, num_parallel_tree=None, ...)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item\"><div class=\"sk-estimator fitted sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-1\" type=\"checkbox\" checked><label for=\"sk-estimator-id-1\" class=\"sk-toggleable__label fitted sk-toggleable__label-arrow\"><div><div>XGBClassifier</div></div><div><a class=\"sk-estimator-doc-link fitted\" rel=\"noreferrer\" target=\"_blank\" href=\"https://xgboost.readthedocs.io/en/release_3.2.0/python/python_api.html#xgboost.XGBClassifier\">?<span>Documentation for XGBClassifier</span></a><span class=\"sk-estimator-doc-link fitted\">i<span>Fitted</span></span></div></label><div class=\"sk-toggleable__content fitted\"><pre>XGBClassifier(base_score=None, booster=None, callbacks=None,\n",
+              "              monotone_constraints=None, multi_strategy=None, n_estimators=300,\n",
+              "              n_jobs=None, num_parallel_tree=None, ...)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item\"><div class=\"sk-estimator fitted sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-5\" type=\"checkbox\" checked><label for=\"sk-estimator-id-5\" class=\"sk-toggleable__label fitted sk-toggleable__label-arrow\"><div><div>XGBClassifier</div></div><div><a class=\"sk-estimator-doc-link fitted\" rel=\"noreferrer\" target=\"_blank\" href=\"https://xgboost.readthedocs.io/en/release_3.2.0/python/python_api.html#xgboost.XGBClassifier\">?<span>Documentation for XGBClassifier</span></a><span class=\"sk-estimator-doc-link fitted\">i<span>Fitted</span></span></div></label><div class=\"sk-toggleable__content fitted\"><pre>XGBClassifier(base_score=None, booster=None, callbacks=None,\n",
               "              colsample_bylevel=None, colsample_bynode=None,\n",
               "              colsample_bytree=None, device=None, early_stopping_rounds=None,\n",
               "              enable_categorical=False, eval_metric=None, feature_types=None,\n",
               "              feature_weights=None, gamma=None, grow_policy=None,\n",
               "              importance_type=None, interaction_constraints=None,\n",
-              "              learning_rate=0.1, max_bin=None, max_cat_threshold=None,\n",
-              "              max_cat_to_onehot=None, max_delta_step=None, max_depth=6,\n",
+              "              learning_rate=0.05, max_bin=None, max_cat_threshold=None,\n",
+              "              max_cat_to_onehot=None, max_delta_step=None, max_depth=8,\n",
               "              max_leaves=None, min_child_weight=None, missing=nan,\n",
-              "              monotone_constraints=None, multi_strategy=None, n_estimators=200,\n",
+              "              monotone_constraints=None, multi_strategy=None, n_estimators=300,\n",
               "              n_jobs=None, num_parallel_tree=None, ...)</pre></div> </div></div></div></div>"
             ]
           },
           "metadata": {},
-          "execution_count": 10
+          "execution_count": 66
         }
       ]
     },
     {
       "cell_type": "code",
       "source": [
-        "predictions = model.predict(X_test)"
+        "print(\"Colonnes X_test :\", len(X_test.columns))\n",
+        "print(X_test.columns.tolist())"
       ],
       "metadata": {
-        "id": "N7uxztVsgClF"
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "WS84VZl5_yl5",
+        "outputId": "035da275-3973-4dae-9a99-4bff35f2751d"
       },
-      "execution_count": 11,
-      "outputs": []
+      "execution_count": 74,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Colonnes X_test : 16\n",
+            "['YEAR', 'MONTH', 'DAY', 'DAY_OF_WEEK', 'ORIGIN_AIRPORT', 'DESTINATION_AIRPORT', 'SCHEDULED_DEPARTURE', 'SCHEDULED_TIME', 'ELAPSED_TIME', 'DISTANCE', 'SCHEDULED_ARRIVAL', 'HOUR', 'VISIBILITY', 'WIND_SPEED', 'TEMPERATURE', 'PRECIPITATION']\n"
+          ]
+        }
+      ]
     },
     {
       "cell_type": "code",
       "source": [
-        "import joblib\n",
+        "from sklearn.metrics import classification_report\n",
+        "\n",
+        "predictions = model.predict(X_test)\n",
+        "\n",
+        "print(\n",
+        "    classification_report(\n",
+        "        y_test,\n",
+        "        predictions\n",
+        "    )\n",
+        ")"
+      ],
+      "metadata": {
+        "id": "N7uxztVsgClF",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "390de2a3-f1ad-4f7b-823b-c5510d7d3af8"
+      },
+      "execution_count": 73,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "              precision    recall  f1-score   support\n",
+            "\n",
+            "           0       0.90      0.69      0.78    974950\n",
+            "           1       0.35      0.68      0.47    244402\n",
+            "\n",
+            "    accuracy                           0.69   1219352\n",
+            "   macro avg       0.62      0.68      0.62   1219352\n",
+            "weighted avg       0.79      0.69      0.72   1219352\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\"\"\"import joblib\n",
         "import os\n",
         "\n",
         "os.makedirs(\"models\", exist_ok=True)\n",
@@ -11655,106 +12178,56 @@ Disallow:
         "    \"models/aerosafe_model.pkl\"\n",
         ")\n",
         "\n",
-        "print(\"Modèle sauvegardé avec succès\")"
+        "print(\"Modèle sauvegardé avec succès\") \"\"\""
       ],
       "metadata": {
-        "colab": {
-          "base_uri": "https://localhost:8080/"
-        },
         "id": "gHRYVX8PgW_u",
-        "outputId": "0202ed58-834f-4d48-9ba7-de341a323a70"
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 53
+        },
+        "outputId": "c09b2c01-58df-43d2-d2e9-1c13675e5446"
       },
-      "execution_count": 18,
+      "execution_count": 69,
       "outputs": [
         {
-          "output_type": "stream",
-          "name": "stdout",
-          "text": [
-            "Modèle sauvegardé avec succès\n"
-          ]
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "'import joblib\\nimport os\\n\\nos.makedirs(\"models\", exist_ok=True)\\n\\njoblib.dump(\\n    model,\\n    \"models/aerosafe_model.pkl\"\\n)\\n\\nprint(\"Modèle sauvegardé avec succès\") '"
+            ],
+            "application/vnd.google.colaboratory.intrinsic+json": {
+              "type": "string"
+            }
+          },
+          "metadata": {},
+          "execution_count": 69
         }
       ]
     },
     {
       "cell_type": "code",
       "source": [
-        "from google.colab import files\n",
-        "\n",
-        "files.download(\"/content/models/aerosafe_model.pkl\")"
+        "#from google.colab import files\n",
+        "import joblib\n",
+        "joblib.dump(model, \"/content/drive/MyDrive/AeroSafeAI/models/aerosafe_model1.pkl\")\n",
+        "print(\"Modèle sauvegardé avec succès !\")"
       ],
       "metadata": {
-        "colab": {
-          "base_uri": "https://localhost:8080/",
-          "height": 17
-        },
         "id": "whBmCVUOgxIJ",
-        "outputId": "69c74940-c6e2-48c6-e453-3ca7f7ca13d8"
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "815e5964-1068-4287-cfe8-519f7a867904"
       },
-      "execution_count": 19,
+      "execution_count": 75,
       "outputs": [
         {
-          "output_type": "display_data",
-          "data": {
-            "text/plain": [
-              "<IPython.core.display.Javascript object>"
-            ],
-            "application/javascript": [
-              "\n",
-              "    async function download(id, filename, size) {\n",
-              "      if (!google.colab.kernel.accessAllowed) {\n",
-              "        return;\n",
-              "      }\n",
-              "      const div = document.createElement('div');\n",
-              "      const label = document.createElement('label');\n",
-              "      label.textContent = `Downloading \"${filename}\": `;\n",
-              "      div.appendChild(label);\n",
-              "      const progress = document.createElement('progress');\n",
-              "      progress.max = size;\n",
-              "      div.appendChild(progress);\n",
-              "      document.body.appendChild(div);\n",
-              "\n",
-              "      const buffers = [];\n",
-              "      let downloaded = 0;\n",
-              "\n",
-              "      const channel = await google.colab.kernel.comms.open(id);\n",
-              "      // Send a message to notify the kernel that we're ready.\n",
-              "      channel.send({})\n",
-              "\n",
-              "      for await (const message of channel.messages) {\n",
-              "        // Send a message to notify the kernel that we're ready.\n",
-              "        channel.send({})\n",
-              "        if (message.buffers) {\n",
-              "          for (const buffer of message.buffers) {\n",
-              "            buffers.push(buffer);\n",
-              "            downloaded += buffer.byteLength;\n",
-              "            progress.value = downloaded;\n",
-              "          }\n",
-              "        }\n",
-              "      }\n",
-              "      const blob = new Blob(buffers, {type: 'application/binary'});\n",
-              "      const a = document.createElement('a');\n",
-              "      a.href = window.URL.createObjectURL(blob);\n",
-              "      a.download = filename;\n",
-              "      div.appendChild(a);\n",
-              "      a.click();\n",
-              "      div.remove();\n",
-              "    }\n",
-              "  "
-            ]
-          },
-          "metadata": {}
-        },
-        {
-          "output_type": "display_data",
-          "data": {
-            "text/plain": [
-              "<IPython.core.display.Javascript object>"
-            ],
-            "application/javascript": [
-              "download(\"download_719b0d16-8839-4799-a65d-27bd048fcb0a\", \"aerosafe_model.pkl\", 153120)"
-            ]
-          },
-          "metadata": {}
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Modèle sauvegardé avec succès !\n"
+          ]
         }
       ]
     },
@@ -11762,9 +12235,9 @@ Disallow:
       "cell_type": "code",
       "source": [],
       "metadata": {
-        "id": "L93J0tlqkpfe"
+        "id": "hIc7PMU8HvUm"
       },
-      "execution_count": null,
+      "execution_count": 72,
       "outputs": []
     }
   ]
@@ -11775,22 +12248,6 @@ Disallow:
 ============================================================
 
 {
-  "nbformat": 4,
-  "nbformat_minor": 0,
-  "metadata": {
-    "colab": {
-      "provenance": [],
-      "authorship_tag": "ABX9TyNcxxaEya/om/xBprYNyOcB",
-      "include_colab_link": true
-    },
-    "kernelspec": {
-      "name": "python3",
-      "display_name": "Python 3"
-    },
-    "language_info": {
-      "name": "python"
-    }
-  },
   "cells": [
     {
       "cell_type": "markdown",
@@ -11804,31 +12261,31 @@ Disallow:
     },
     {
       "cell_type": "code",
-      "source": [
-        "from google.colab import drive\n",
-        "drive.mount('/content/drive')"
-      ],
+      "execution_count": 50,
       "metadata": {
         "colab": {
           "base_uri": "https://localhost:8080/"
         },
         "id": "gEmHQ9ZvwBDj",
-        "outputId": "7f864d7e-31aa-4df7-e45a-8913609f11cf"
+        "outputId": "677e5038-e956-4adf-f00d-f86747d4b4f6"
       },
-      "execution_count": 2,
       "outputs": [
         {
           "output_type": "stream",
           "name": "stdout",
           "text": [
-            "Mounted at /content/drive\n"
+            "Drive already mounted at /content/drive; to attempt to forcibly remount, call drive.mount(\"/content/drive\", force_remount=True).\n"
           ]
         }
+      ],
+      "source": [
+        "from google.colab import drive\n",
+        "drive.mount('/content/drive')"
       ]
     },
     {
       "cell_type": "code",
-      "execution_count": 3,
+      "execution_count": 51,
       "metadata": {
         "id": "c2YIMqf_thaO"
       },
@@ -11843,18 +12300,15 @@ Disallow:
     },
     {
       "cell_type": "code",
-      "source": [
-        "df.isnull().sum()"
-      ],
+      "execution_count": 52,
       "metadata": {
         "colab": {
           "base_uri": "https://localhost:8080/",
           "height": 774
         },
         "id": "ka_naScSwIyP",
-        "outputId": "c858f613-1ddf-4689-8d35-436b78f39917"
+        "outputId": "67fba016-698e-4545-8285-cdd3ea5ff988"
       },
-      "execution_count": 4,
       "outputs": [
         {
           "output_type": "execute_result",
@@ -12001,24 +12455,24 @@ Disallow:
             ]
           },
           "metadata": {},
-          "execution_count": 4
+          "execution_count": 52
         }
+      ],
+      "source": [
+        "df.isnull().sum()"
       ]
     },
     {
       "cell_type": "code",
-      "source": [
-        "df['RISK_LEVEL']"
-      ],
+      "execution_count": 53,
       "metadata": {
         "colab": {
           "base_uri": "https://localhost:8080/",
           "height": 459
         },
         "id": "nNH6alztzTd_",
-        "outputId": "b8b0334e-78d6-47ec-9c03-bc4721fca8d6"
+        "outputId": "27ffbb05-b805-4ce2-de02-f8ba669cc5a0"
       },
-      "execution_count": 5,
       "outputs": [
         {
           "output_type": "execute_result",
@@ -12111,59 +12565,61 @@ Disallow:
             ]
           },
           "metadata": {},
-          "execution_count": 5
+          "execution_count": 53
         }
+      ],
+      "source": [
+        "df['RISK_LEVEL']"
       ]
     },
     {
       "cell_type": "code",
       "source": [
-        "from sklearn.preprocessing import OneHotEncoder\n",
-        "\n",
-        "encoder = OneHotEncoder(sparse_output=False)\n",
-        "\n",
-        "encoded = encoder.fit_transform(df[[\"RISK_LEVEL\"]])"
+        "print(df[\"RISK_LEVEL\"].value_counts())"
       ],
       "metadata": {
-        "id": "FHMIMKAUyewP"
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "zuOmM54--G2b",
+        "outputId": "86f13146-d1d9-4c74-8826-3fe2a311a460"
       },
-      "execution_count": 6,
-      "outputs": []
+      "execution_count": 54,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "RISK_LEVEL\n",
+            "Vert      3271427\n",
+            "Orange    2425920\n",
+            "Rouge      399411\n",
+            "Name: count, dtype: int64\n"
+          ]
+        }
+      ]
     },
     {
       "cell_type": "code",
-      "source": [
-        "X = df.drop(\n",
-        "    columns=[\"RISK_LEVEL\"]\n",
-        ")\n",
-        "\n",
-        "y = df[\"RISK_LEVEL\"]"
-      ],
+      "execution_count": 55,
       "metadata": {
         "id": "Z-4YSS2Cw-FU"
       },
-      "execution_count": 7,
-      "outputs": []
-    },
-    {
-      "cell_type": "code",
+      "outputs": [],
       "source": [
         "import numpy as np\n",
+        "\n",
         "df[\"RISK_LEVEL\"] = np.where(\n",
         "    df[\"DEPARTURE_DELAY\"] > 15,\n",
         "    1,\n",
         "    0\n",
-        ")"
-      ],
-      "metadata": {
-        "id": "uxs2pt_Lxcmo"
-      },
-      "execution_count": 8,
-      "outputs": []
-    },
-    {
-      "cell_type": "code",
-      "source": [
+        ")\n",
+        "df = df.drop(\n",
+        "    columns=[\n",
+        "        \"FLIGHT_DATETIME\"\n",
+        "    ],\n",
+        "    errors=\"ignore\"\n",
+        ")\n",
         "from sklearn.preprocessing import LabelEncoder\n",
         "\n",
         "le_origin = LabelEncoder()\n",
@@ -12174,57 +12630,75 @@ Disallow:
         "df[\"DESTINATION_AIRPORT\"] = le_dest.fit_transform(\n",
         "    df[\"DESTINATION_AIRPORT\"]\n",
         ")"
-      ],
-      "metadata": {
-        "id": "KDZBCCnoAuWL"
-      },
-      "execution_count": 9,
-      "outputs": []
+      ]
     },
     {
       "cell_type": "code",
-      "source": [
-        "df = df.drop(\n",
-        "    columns=[\n",
-        "        \"FLIGHT_DATETIME\"\n",
-        "    ],\n",
-        "    errors=\"ignore\"\n",
-        ")"
-      ],
+      "execution_count": 56,
       "metadata": {
-        "id": "FGha7eCTK469"
+        "id": "uxs2pt_Lxcmo"
       },
-      "execution_count": 10,
-      "outputs": []
-    },
-    {
-      "cell_type": "code",
+      "outputs": [],
       "source": [
         "X = df.drop(\n",
         "    columns=[\n",
-        "        \"RISK_LEVEL\"\n",
+        "        \"RISK_LEVEL\",\n",
+        "        \"DEPARTURE_DELAY\",\n",
+        "        \"ARRIVAL_DELAY\",\n",
+        "        \"DEPARTURE_TIME\",\n",
+        "        \"ARRIVAL_TIME\"\n",
         "    ]\n",
         ")\n",
         "\n",
         "y = df[\"RISK_LEVEL\"]"
-      ],
-      "metadata": {
-        "id": "CY5s2id2Lfr8"
-      },
-      "execution_count": 11,
-      "outputs": []
-    },
-    {
-      "cell_type": "markdown",
-      "source": [
-        "# données"
-      ],
-      "metadata": {
-        "id": "iyCCP-kOLlBY"
-      }
+      ]
     },
     {
       "cell_type": "code",
+      "source": [
+        "print(X.columns.tolist())\n",
+        "print(y.head())"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "wgR3xO--uKYu",
+        "outputId": "6f31909a-6f5b-43c1-f39f-2283b37e0738"
+      },
+      "execution_count": 57,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "['YEAR', 'MONTH', 'DAY', 'DAY_OF_WEEK', 'ORIGIN_AIRPORT', 'DESTINATION_AIRPORT', 'SCHEDULED_DEPARTURE', 'SCHEDULED_TIME', 'ELAPSED_TIME', 'DISTANCE', 'SCHEDULED_ARRIVAL', 'HOUR', 'VISIBILITY', 'WIND_SPEED', 'TEMPERATURE', 'PRECIPITATION']\n",
+            "0    0\n",
+            "1    0\n",
+            "2    0\n",
+            "3    0\n",
+            "4    0\n",
+            "Name: RISK_LEVEL, dtype: int64\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "iyCCP-kOLlBY"
+      },
+      "source": [
+        "# données"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 58,
+      "metadata": {
+        "id": "O1oMdgiFLiG1"
+      },
+      "outputs": [],
       "source": [
         "from sklearn.model_selection import train_test_split\n",
         "\n",
@@ -12234,38 +12708,55 @@ Disallow:
         "    test_size=0.2,\n",
         "    random_state=42\n",
         ")"
-      ],
-      "metadata": {
-        "id": "O1oMdgiFLiG1"
-      },
-      "execution_count": 12,
-      "outputs": []
+      ]
     },
     {
       "cell_type": "code",
-      "source": [
-        "X_train.to_csv(\"X_train.csv\", index=False)\n",
-        "X_test.to_csv(\"X_test.csv\", index=False)\n",
-        "\n",
-        "y_train.to_csv(\"y_train.csv\", index=False)\n",
-        "y_test.to_csv(\"y_test.csv\", index=False)"
-      ],
+      "execution_count": 59,
       "metadata": {
         "id": "LDIuD9sJLo_a"
       },
-      "execution_count": 13,
-      "outputs": []
+      "outputs": [],
+      "source": [
+        "# X_train.to_csv(\"X_train.csv\", index=False)\n",
+        "# X_test.to_csv(\"X_test.csv\", index=False)\n",
+        "\n",
+        "# y_train.to_csv(\"y_train.csv\", index=False)\n",
+        "# y_test.to_csv(\"y_test.csv\", index=False)"
+      ]
     },
     {
       "cell_type": "code",
-      "source": [],
+      "execution_count": 60,
       "metadata": {
         "id": "2TBFh-sULuIw"
       },
-      "execution_count": null,
-      "outputs": []
+      "outputs": [],
+      "source": [
+        "X_train.to_csv(\"/content/drive/MyDrive/AeroSafeAI/X_train.csv\", index=False)\n",
+        "X_test.to_csv(\"/content/drive/MyDrive/AeroSafeAI/X_test.csv\", index=False)\n",
+        "\n",
+        "y_train.to_csv(\"/content/drive/MyDrive/AeroSafeAI/y_train.csv\", index=False)\n",
+        "y_test.to_csv(\"/content/drive/MyDrive/AeroSafeAI/y_test.csv\", index=False)"
+      ]
     }
-  ]
+  ],
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyMgLZmfUY2Z93Fqx0Mz26Sv",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "display_name": "Python 3",
+      "name": "python3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 0
 }
 
 ============================================================
@@ -15786,12 +16277,12 @@ td[style*="font-family: monospace"], .big-input {
     </div>
 
     <div class="search-box">
-        <form id="search-flight-form">
+        <form id="search-flight-form" method="get">
             <div class="form-group">
                 <label for="flight-number" style="text-align: center; display: block; font-weight: 600;">Entrez votre numéro de vol</label>
                 <input type="text" id="flight-number" class="big-input" placeholder="Ex: KP023" autocomplete="off" required>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem; margin-top: 15px;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem; margin-top: 15px;" >
                 Analyser la sécurité du vol
             </button>
         </form>

@@ -1,26 +1,58 @@
+// ============================================================
+// hackaDash.js — Dashboard Superviseur ANAC
+// Connecté au backend Flask via GET /api/vols
+// ============================================================
+
+// URL de base du microservice IA
+const API_BASE = "http://localhost:5000";
+
+// Vérification d'accès
 (function verifierAcces() {
     const role = localStorage.getItem("userRole");
     if (!role || role !== "superviseur") {
         alert("Accès restreint. Identification Superviseur ANAC requise.");
-        window.location.href = "login.html";
+        window.location.href = "hackConnection.html";
     }
 })();
 
-// Données simulées en attendant le fetch() de l'API Flask
-const volsData = [
-    { numVol: "KP 023", compagnie: "ASKY", destination: "Abidjan (ABJ)", heure: "15:45", risque: 12, statut: "A l'heure" },
-    { numVol: "AF 858", compagnie: "Air France", destination: "Paris (CDG)", heure: "20:15", risque: 78, statut: "Alerte Météo" },
-    { numVol: "ET 901", compagnie: "Ethiopian", destination: "Addis-Abeba", heure: "18:30", risque: 45, statut: "Vigilance" },
-    { numVol: "KP 110", compagnie: "ASKY", destination: "Dakar (DSS)", heure: "11:20", risque: 5, statut: "Sécurisé" }
-];
-
+// Chargement des vols au démarrage de la page
 document.addEventListener("DOMContentLoaded", () => {
-    genererTableauVols(volsData);
+    chargerVols();
 });
 
+/**
+ * Récupère les vols depuis l'API Flask et met à jour le tableau.
+ */
+async function chargerVols() {
+    const tbody = document.getElementById("vols-tbody");
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:30px;">⏳ Chargement des données...</td></tr>`;
+
+    try {
+        const response = await fetch(`${API_BASE}/api/vols`);
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP ${response.status}`);
+        }
+
+        const vols = await response.json();
+        genererTableauVols(vols);
+
+    } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--red); padding:30px;">
+            ❌ Impossible de contacter le service IA.<br>
+            <small style="color:var(--text-muted);">Vérifiez que le backend Flask tourne sur ${API_BASE}</small>
+        </td></tr>`;
+        console.error("Erreur chargement vols :", error);
+    }
+}
+
+/**
+ * Génère les lignes du tableau à partir des données retournées par l'API.
+ * @param {Array} vols - tableau d'objets { numVol, compagnie, destination, heure, risque, statut }
+ */
 function genererTableauVols(vols) {
     const tbody = document.getElementById("vols-tbody");
-    tbody.innerHTML = ""; // Vide le tableau d'éventuelles anciennes données
+    tbody.innerHTML = "";
 
     let alerteRougeCount = 0;
     let volVertCount = 0;
@@ -28,8 +60,7 @@ function genererTableauVols(vols) {
     vols.forEach(vol => {
         let statutClass = "";
         let risqueClass = "";
-        
-        // Logique de couleur selon les règles de seuil
+
         if (vol.risque < 30) {
             statutClass = "badge-green";
             risqueClass = "text-green";
@@ -43,7 +74,6 @@ function genererTableauVols(vols) {
             alerteRougeCount++;
         }
 
-        // Création de la ligne de tableau
         const row = document.createElement("tr");
         row.innerHTML = `
             <td style="font-family: monospace; font-weight: bold; color: #fff;">${vol.numVol}</td>
@@ -63,37 +93,20 @@ function genererTableauVols(vols) {
         tbody.appendChild(row);
     });
 
-    // Remplissage dynamique des compteurs en haut de la page
+    // Mise à jour des compteurs KPI
     document.getElementById("total-vols").innerText = vols.length;
     document.getElementById("total-alertes-rouges").innerText = alerteRougeCount;
     document.getElementById("total-vols-verts").innerText = volVertCount;
 }
 
-const logoutBtn = document.getElementById("logout-btn");
-if (logoutBtn) {
-    logoutBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        localStorage.clear(); // Efface les jetons de session
-        window.location.href = "login.html"; // Renvoie au login
-    });
-}
-
-// --- GESTION DE LA DÉCONNEXION ---
+// Gestion de la déconnexion
 document.addEventListener("DOMContentLoaded", () => {
     const logoutBtn = document.getElementById("logout-btn");
-    
     if (logoutBtn) {
         logoutBtn.addEventListener("click", (e) => {
-            // Empêche le comportement par défaut du lien (#)
-            e.preventDefault(); 
-            
-            // 1. Vide la session (supprime le rôle et le nom de l'agent)
-            localStorage.clear(); 
-            
-            console.log("Session effacée. Redirection vers l'écran de connexion...");
-            
-            // 2. Renvoie directement à la page de connexion dans le même dossier
-            window.location.href = "hackAcceuil.html"; 
+            e.preventDefault();
+            localStorage.clear();
+            window.location.href = "hackAcceuil.html";
         });
     }
 });
