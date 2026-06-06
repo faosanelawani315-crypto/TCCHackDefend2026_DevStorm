@@ -2,8 +2,9 @@ fastapi
 uvicorn
 pandas
 numpy
-scikit-learn
-xgboost
 joblib
+xgboost
+scikit-learn
 requests
 pydantic
+python-multipart
